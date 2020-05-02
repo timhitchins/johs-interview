@@ -1,0 +1,54 @@
+---
+title: "JOHS Interview - Data Assignment"
+author: "Tim Hitchins"
+date: "5/6/2020"
+output: 
+  revealjs::revealjs_presentation:
+    theme: sky
+    highlight: pygments
+    center: true
+    self_contained: false
+    # reveal_plugins: ["search", "zoom", "notes", "chalkboard", "menu"]
+    # reveal_options:
+    #   chalkboard: 
+    #     theme: chalkboard
+    #     toggleNotesButton: true
+    #   menu:
+    #     numbers: true
+---
+
+# In the morning
+
+## Getting up
+
+- Turn off alarm
+- Get out of bed
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require(tidyverse)) install.packages("tidyverse")
+
+```
+
+# In the morning
+
+## Getting up
+
+- Turn off alarm
+- Get out of bed
+```{r cars}
+summary(cars)
+```
+
+# In the morning
+
+## Getting up
+
+- Turn off alarm
+- Get out of bed
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+
