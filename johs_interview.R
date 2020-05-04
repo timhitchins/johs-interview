@@ -24,13 +24,15 @@ if (!require(readxl))
   install.packages("readxl")
 if (!require(lubridate))
   install.packages("lubridate")
-if (!require(plotly))
-  install.packages("plotly")
 if (!require(janitor))
   install.packages("janitor")
 if (!require(scales))
   install.packages("scales")
-p_load(tidyverse, readxl, lubridate, plotly, janitor, scales)
+if(!require(psych))
+  install.packages("psych")
+if(!require(pander))
+  install.packages("pander")
+p_load(tidyverse, readxl, lubridate, janitor, scales, psych, pander)
 
 ################
 ## READ PHASE
@@ -222,9 +224,124 @@ raceGender
 ##age race plot here
 ageRace <- ggplot(client, aes())
 
+##ANSWERING SPECIFIC QUESTION:
+##1. Is there a difference between POC and White clients in duration of enrollment
+##create data
+duration_race <-
+  client_ee %>% group_by(client_id, race2) %>%
+  summarise(avg_duration = mean(duration), num_enrollments = n())
+
+#simple stats
+IQR(duration_race$avg_duration) ##difference of its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value.
+mean(duration_race$avg_duration)
+median(duration_race$avg_duration)
+sd(duration_race$avg_duration)
+
+## t-test and confidence intervals
+w <- duration_race[duration_race$race2=="White",]
+poc <-duration_race[duration_race$race2=="Person of Color",]
+t.test(w$avg_duration, poc$avg_duration) ##no difference
+
+## confidence intervals white
+describe(w$avg_duration)
+n_w <- 21981
+xbar_w <- 0.8
+sd_w <- 1.89
+alpha <- 0.05 ##Confidence of 95%
+
+(xbar_w + qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.7750146
+(xbar_w - qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.8249854
+
+## confidence intervals poc
+describe(poc$avg_duration)
+n_poc <- 16810
+xbar_poc <- 0.63
+sd_poc <- 1.29
+alpha <- 0.05 ##Confidence of 95%
+(xbar_poc + qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6104991
+(xbar_poc - qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6495009
+
+##visualize it
+durationRacePlot <- ggplot(duration_race[duration_race$avg_duration < 2.27,], aes(avg_duration)) +
+  geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
+  geom_vline(xintercept = .18, col = "coral4", size=1) + # median
+  ggtitle("Avg. Duration of Enrollment by Client Race") +
+  ylab("density") +
+  xlab("duration in years") +
+  geom_text(aes(label=".18", y=1, x=.18), color="black", vjust=-1)
+durationRacePlot 
+##
+
+##only using completed enrollment cycles
+duration_race_filt <-
+  client_ee %>% filter(!is.na(exit_date)) %>%
+  filter(!is.na(race2)) %>%
+  group_by(client_id, race2) %>%
+  summarise(avg_duration = mean(duration), num_enrollments = n())
+
+
+duration_race_filt$log10_duration <- log10(duration_race_filt$avg_duration)
+#simple stats
+IQR(duration_race_filt$avg_duration) ##difference of its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value.
+mean(duration_race_filt$avg_duration)
+median(duration_race_filt$avg_duration)
+sd(duration_race_filt$avg_duration)
+
+## t-test and confidence intervals
+duration_race_filt
+t.test(log10_duration ~ race2, data=duration_race_filt, alternative="two.sided") ##no difference
+aov(log10_duration ~ race2, data=duration_race_filt)
+# ## confidence intervals white
+# describe(w$avg_duration)
+# n_w <- 21981
+# xbar_w <- 0.8
+# sd_w <- 1.89
+# alpha <- 0.05 ##Confidence of 95%
+# 
+# (xbar_w + qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.7750146
+# (xbar_w - qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.8249854
+# 
+# ## confidence intervals poc
+# describe(poc$avg_duration)
+# n_poc <- 16810
+# xbar_poc <- 0.63
+# sd_poc <- 1.29
+# alpha <- 0.05 ##Confidence of 95%
+# (xbar_poc + qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6104991
+# (xbar_poc - qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6495009
+
+durationRacePlotFilt <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
+  geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
+  # geom_vline(xintercept = .18, col = "coral4", size=1) + # median
+  ggtitle("Avg. Duration of Enrollment by Client Race") +
+  ylab("density") +
+  xlab("log10 duration in years for completed enrollments") 
+# + geom_text(aes(label=".18", y=1, x=.18), color="black", vjust=-1)
+durationRacePlotFilt
+## 2. Is there a diffence between white and poc exit_reason
+##Chi Sq Tests
+reasons <- unique(client_ee$exit_reason)
+reasons <- reasons[!is.na(reasons)]
+client_ee %>%  select(race2, exit_reason) %>%
+  table() %>%
+  chisq.test()
+
+
+##find sig differences
+for(i in reasons){
+  print(i)
+  result <- client_ee %>% filter(exit_reason == i) %>% 
+    select(race2, exit_reason) %>%
+    table() %>%
+    chisq.test() %>%
+    pander()
+  print(result$p.value)
+}
 
 
 
 
 ###testing
 x <- lubridate::interval(ymd("2005-11-01"), ymd("2016-10-31"))
+names(ee)
+unique(ee$exit_reason)
