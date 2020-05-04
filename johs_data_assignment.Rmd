@@ -1,6 +1,6 @@
 ---
-title: "JOHS Interview - Data Assignment"
-author: "Tim Hitchins"
+title: "Asssessing Racial Equity through the Homeless Management Information System (HMIS)"
+author: "<img src='./assets/logo.png'>"
 date: "5/6/2020"
 output: 
   revealjs::revealjs_presentation:
@@ -15,38 +15,263 @@ output:
     #     toggleNotesButton: true
     #   menu:
     #     numbers: true
+knit: (
+  function(inputFile, encoding) { 
+    rmarkdown::render( 
+      input       = inputFile, 
+      encoding    = encoding, 
+      params      = list(sub_title = pSubTitle),      
+      output_file = 'index.html') })
 ---
-## Video background {data-background-video=""}
 
-# In the morning
-
-## Getting up
-
-- Turn off alarm
-- Get out of bed
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-if(!require(tidyverse)) install.packages("tidyverse")
+options(stringsAsFactors = FALSE)
+
+## Package installs
+if (!require(pacman))
+  install.packages(pacman)
+library(pacman)
+if (!require(tidyverse))
+  install.packages("tidyverse")
+if (!require(readxl))
+  install.packages("readxl")
+if (!require(lubridate))
+  install.packages("lubridate")
+if (!require(janitor))
+  install.packages("janitor")
+if (!require(scales))
+  install.packages("scales")
+if(!require(psych))
+  install.packages("psych")
+if(!require(pander))
+  install.packages("pander")
+p_load(tidyverse, readxl, lubridate, janitor, scales, psych, pander)
 
 ```
 
-# In the morning
+```{r read, include=FALSE}
+################
+## READ PHASE
+###############
+path <- "./data.xlsx" ##realtive to current wd
+sheet_names <- excel_sheets(path)
 
-## Getting up
+##read in the sheets
+##standardize names
+sheets <- lapply(sheet_names, read_excel, path = path)
+client <- clean_names(sheets[[1]])
+ee <- clean_names(sheets[[2]])
 
-- Turn off alarm
-- Get out of bed
+```
+
+```{r wrangle, include=FALSE}
+################
+## WRANGLE PHASE
+###############
+PULL_DATE <-
+  "2019-06-30 00:00:00" ## this is not clear in the instructions
+
+## STEP 1: CREATE HELPER FUNCTIONS
+##################################
+##function to recode to NA
+createNAs <- function(val) {
+  toNAs <-
+    c("Client refused", "Data not collected", "Client doesn't know")
+  if (val %in% toNAs)
+    return(NA)
+  else
+    return(val)
+}
+
+##helper for handling dates var
+dateTrimmer <- function(x) {
+  if (is.na(x)) {
+    return(x)
+  }
+  else {
+    date <- str_split(x, " ")
+    return(date[[1]][1])
+  }
+}
+
+##calculate the year interval between two dates
+calcInterval <- function(date1, date2, type, digits) {
+  period <- interval(ymd(unlist(lapply(
+    date1, dateTrimmer
+  ))), ymd(unlist(lapply(
+    date2, dateTrimmer
+  )))) / years(1)
+  
+  if (type == "floor") {
+    return(floor(period))
+  } else if (type == "round") {
+    return(round(period, digits))
+  }
+  
+}
+
+createPOC <- function(x) {
+  poc <-
+    c(
+      "Asian",
+      "Black or African American",
+      "American Indian or Alaska Native",
+      "Native Hawaiian or Other Pacific Islander"
+    )
+  if (x %in% poc) {
+    return("Person of Color")
+  } else{
+    return(x)
+  }
+}
+
+## heler to fix exit date NA vals in ee
+## to correspond to 2019-06-2019 00:00:00
+exitDateFixer <- function(x) {
+  if (is.na(x)) {
+    return(PULL_DATE) ##see constant
+  } else{
+    return(x)
+  }
+}
+
+### STEP 2: CLEAN DATA
+###########################
+## convert "Client refused",
+## "Data not collected",
+## "Client doesn't know" vals
+## to NAs over entire dfs /
+## then convert to tibble
+client <- client %>%
+  apply(MARGIN = c(1, 2), FUN = createNAs) %>%
+  as_tibble()
+
+ee  <- ee %>%
+  apply(MARGIN = c(1, 2), FUN = createNAs) %>%
+  as_tibble()
+
+## PREP CLIENT DATA COLS
+#########################
+##calculate age of client
+client$client_age  <-
+  calcInterval(client$date_of_birth, PULL_DATE, "floor")
+
+
+client$race2 <- unlist(lapply(client$race, createPOC))
+
+## PREP EE DATA COLS
+#####################
+##fix the exit NAs to reflect the PULL_DATE
+ee$exit_date_recode <- unlist(lapply(ee$exit_date, exitDateFixer))
+
+##create duration var in ee table
+ee$duration <-
+  calcInterval(ee$entry_date, ee$exit_date_recode, "round", 2)
+
+## JOIN TABLES
+######################
+## PK in client is client_id
+## PK in ee is ee_id
+
+## new joined table
+client_ee <- client %>% inner_join(ee, by = c("client_id"))
+```
+
+# Agenda
+
+##
+<ul>
+  <li> Background </li>
+  <li class="fragment">Methods / Analysis </li>
+  <li class="fragment">Results </li>
+  <li class="fragment">Future Research </li>
+</ul>
+
+# Background
+
+## What is an <span style="color: tomato;">HMIS</span>?
+
+<blockquote style="border: none; box-shadow: none;"> "Homeless Management Information Systems are used to record client information that is shared among homeless and near-homeless service providers in order to increase efficiencies and better meet client needs."<sub><small>City of Portland - 2020</small></sub></blockquote>
+<img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png">
+
+<!-- https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents -->
+
+## SNAPS Guidelines
+<ul>
+  <li class="fragment">Communities use their data to <span style="color: tomato;">optimize systems of care </span> through making ongoing system performance improvements and determining optimal resource allocation; </li>
+
+  <li class="fragment">Communities operate data systems that allow for accurate, comprehensive, and timely data collection, usage and reporting; and </li>
+
+  <li class="fragment">Federal government coordinates to receive and use data to make informed decisions in coordination with other data sets, across and within agencies.</li>
+</ul>
+
+## Promote Racial and Ethnic Justice
+
+<blockquote style="border: none; box-shadow: none;"> "To eliminate the disproportionate rates of homelessness among many communities of color... using a <span style="color: tomato;">racial equity lens</span> across all program investments and dedicated funds to eliminate disparities by race and ethnicity."</blockquote><sub><small>Mulnomah County - 2020</small></sub>
+
+<!-- https://multco.us/housing-and-homelessness/our-vision-and-principles -->
+
+# Methods / Analysis Questions
+
+## Tools
+<img style="max-height: 500px; border: none; box-shadow: none;" src="https://i.ibb.co/th9XGdq/1-Jh-R8-Yqr7g9kn-YVYVmd7q-Q.png">
+<!-- <img style="max-height: 50px;" src="https://image.flaticon.com/icons/svg/25/25231.svg"> -->
+
+## Process
+<img style="max-height: 500px; border: none; box-shadow: none;" src="./assets/johs-prep.png">
+
+
+# Analysis
+
+## Questions
+<ul>
+ <li class="fragment">Demographics: What is the racial and ethnic make-up of clients represented in the HMIS sample?</li>
+ <li class="fragment">To what extent are client race/ethnicity and enrollment duration related?</li>
+ <li class="fragment">To what extent are enrollment exit reasons and race/ethnicty related?</li>
+ <li class="fragment">To waht extent are ...</li>
+</ul>
+
+
+
+# Results
+
+##
+```{r racial demographics, echo=FALSE}
+racePlot <- ggplot(client, aes(race)) +
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = race)) +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Client Race by Percentage") +
+  ylab("percentage") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank()) +
+  guides(fill=guide_legend(title="Race"))
+racePlot
+```
+<!-- Put a table here with percentages -->
+
+##
+```{r racial demo2, echo=FALSE}
+racePlot2 <- ggplot(client, aes(race2)) +
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = race2)) +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Client Race by Percentage") +
+  ylab("percentage") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank()) +
+  guides(fill=guide_legend(title="Race"))
+racePlot2
+```
+<!-- Put a table here with percentages -->
+
+##
 ```{r cars}
-summary(cars)
+pander(summary(cars))
 ```
 
-# In the morning
-
-## Getting up
-
-- Turn off alarm
-- Get out of bed
 
 ```{r pressure, echo=FALSE}
 plot(pressure)

@@ -315,7 +315,7 @@ durationRacePlotFilt <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
   # geom_vline(xintercept = .18, col = "coral4", size=1) + # median
   ggtitle("Avg. Duration of Enrollment by Client Race") +
   ylab("density") +
-  xlab("log10 duration in years for completed enrollments") 
+  xlab("log10 of duration in years for completed enrollments") 
 # + geom_text(aes(label=".18", y=1, x=.18), color="black", vjust=-1)
 durationRacePlotFilt
 ## 2. Is there a diffence between white and poc exit_reason
