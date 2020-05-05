@@ -43,11 +43,15 @@ if (!require(janitor))
   install.packages("janitor")
 if (!require(scales))
   install.packages("scales")
+if(!require(ggmosaic))
+  install.packages("ggmosaic")
 if(!require(psych))
   install.packages("psych")
-if(!require(pander))
-  install.packages("pander")
-p_load(tidyverse, readxl, lubridate, janitor, scales, psych, pander)
+if(!require(knitr))
+  install.packages("knitr")
+if(!require(kableExtra))
+  install.packages("kableExtra")
+p_load(tidyverse, readxl, lubridate, janitor, scales, ggmosaic, psych, knitr, kableExtra)
 
 ```
 
@@ -213,7 +217,7 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 
 <!-- https://multco.us/housing-and-homelessness/our-vision-and-principles -->
 
-# Methods / Analysis Questions
+# Methods
 
 ## Tools
 <img style="max-height: 500px; border: none; box-shadow: none;" src="https://i.ibb.co/th9XGdq/1-Jh-R8-Yqr7g9kn-YVYVmd7q-Q.png">
@@ -223,19 +227,21 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 <img style="max-height: 500px; border: none; box-shadow: none;" src="./assets/johs-prep.png">
 
 
-# Analysis
+# Questions
 
 ## Questions
 <ul>
- <li class="fragment">Demographics: What is the racial and ethnic make-up of clients represented in the HMIS sample?</li>
- <li class="fragment">To what extent are client race/ethnicity and enrollment duration related?</li>
- <li class="fragment">To what extent are enrollment exit reasons and race/ethnicty related?</li>
- <li class="fragment">To waht extent are ...</li>
+ <li class="fragment">Demographics: What is the racial and ethnic composition of clients represented in the HMIS sample?</li>
+ <li class="fragment">To what extent are client race and enrollment duration related?</li>
+ <li class="fragment">To what extent are enrollment exit reasons and race related?</li>
+ <li class="fragment">To what extent are race and permanent housing related?</li>
 </ul>
 
 
 
-# Results
+# Analysis / Results
+
+## What is the racial and ethnic composition of clients represented in the HMIS sample?
 
 ##
 ```{r racial demographics, echo=FALSE}
@@ -252,6 +258,20 @@ racePlot
 ```
 <!-- Put a table here with percentages -->
 
+
+##
+```{r racetable, echo=FALSE}
+client %>%
+  group_by(race) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round(count / sum(count) * 100), 2) %>%
+  select(race, percent) %>%
+  kable() %>%
+  kable_styling()
+```
+
+
+
 ##
 ```{r racial demo2, echo=FALSE}
 racePlot2 <- ggplot(client, aes(race2)) +
@@ -265,16 +285,126 @@ racePlot2 <- ggplot(client, aes(race2)) +
   guides(fill=guide_legend(title="Race"))
 racePlot2
 ```
-<!-- Put a table here with percentages -->
+
 
 ##
-```{r cars}
-pander(summary(cars))
+```{r race2, echo=FALSE}
+client %>%
+  group_by(race2) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round(count / sum(count) * 100), 0) %>%
+  select(race2, percent) %>%
+  kable()
+```
+
+## Portland ACS Data for Context
+<!-- Include acs data here -->
+<img style="border: none; box-shadow: none;" src="./assets/racial_pop_pdx.png">
+
+##
+```{r ethnicity, echo=FALSE}
+ethnicityPlot <- ggplot(client, aes(ethnicity)) +
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = ethnicity)) +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Client Ethnicity by Percentage") +
+  ylab("percentage") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank()) +
+  guides(fill=guide_legend(title="Ethnicity"))
+ethnicityPlot
+```
+
+<!-- include acsd data here -->
+## To what extent are client race/ethnicity and enrollment duration related?
+
+##
+```{r duration, echo=FALSE}
+##create data
+duration_race_filt <-
+  client_ee %>% filter(!is.na(exit_date)) %>%
+  filter(!is.na(race2)) %>%
+  group_by(client_id, race2) %>%
+  summarise(avg_duration = mean(duration), num_enrollments = n())
+
+##add field
+duration_race_filt$log10_duration <- log10(duration_race_filt$avg_duration)
+
+durationRacePlotFilt <-  ggplot(duration_race_filt[duration_race_filt$avg_duration < 1.07,], aes(avg_duration)) + #1sd
+  geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
+  ggtitle("Avg. Duration of Enrollment by Client Race") +
+  ylab("density") +
+  xlab("Duration in years for completed enrollments") +
+  geom_vline(xintercept = 0.145, col = "coral4", size=1)+
+  geom_text(aes(label="55 days", y=2, x=0.145), color="black", vjust=-1)
+durationRacePlotFilt
 ```
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+##
+```{r log transfomr race, echo=FALSE, warning=FALSE}
+durationRacePlotFiltLog10 <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
+  geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
+  ggtitle("Avg. Duration of Enrollment by Client Race") +
+  ylab("density") +
+  xlab("log10 of duration in years for completed enrollments") 
+durationRacePlotFiltLog10
+```
+
+## Answer: There is no significant evidence suggesting a difference between race and the duration of enrollment.
+
+## Does race affect enrollment exit reasons? 
+
+##
+```{r exit reasons, echo=FALSE}
+reasons <- unique(client_ee$exit_reason)
+reasons <- reasons[!is.na(reasons)]
+
+pvals <- list()
+reas <- list()
+for(i in seq(reasons)){
+  result <- client_ee %>% filter(exit_reason == reasons[i]) %>% 
+    select(race2, exit_reason) %>%
+    table() %>%
+    chisq.test() 
+  
+  pvals[[i]] <- result$p.value
+  reas[[i]] <- reasons[i]
+}
+
+data.frame(exit_reason=unlist(reas), pvals=unlist(pvals)) %>%
+  filter(pvals < 0.001) %>% 
+  mutate(pvals = "***") %>%
+  kable()
 ```
 
 
+## Answer: In 11 out of 14 of the stated reasons, there is a relationship between race and the reason a client exited. 
+
+<!-- plot showing who completed a program -->
+
+##
+```{r exit destination, echo=FALSE}
+destinations <- unique(client_ee$exit_destination)
+destinations <- destinations[!is.na(destinations)]
+
+pvals <- list()
+dest <- list()
+for(i in seq(destinations)){
+  result <- client_ee %>% filter(exit_destination == destinations[i]) %>% 
+    select(race2, exit_destination) %>%
+    table() %>%
+    chisq.test() 
+  
+  pvals[[i]] <- result$p.value
+  dest[[i]] <- destinations[i]
+}
+
+data.frame(exit_destination=unlist(dest), pvals=unlist(pvals)) %>%
+  filter(pvals < 0.001) %>% 
+  mutate(pvals = "***") %>%
+  kable()
+```
+
+## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination. 

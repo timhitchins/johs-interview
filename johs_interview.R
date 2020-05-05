@@ -28,11 +28,15 @@ if (!require(janitor))
   install.packages("janitor")
 if (!require(scales))
   install.packages("scales")
+if(!require(ggmosaic))
+  install.packages("ggmosaic")
 if(!require(psych))
   install.packages("psych")
-if(!require(pander))
-  install.packages("pander")
-p_load(tidyverse, readxl, lubridate, janitor, scales, psych, pander)
+if(!require(knitr))
+  install.packages("knitr")
+if(!require(kableExtra))
+  install.packages("kableExtra")
+p_load(tidyverse, readxl, lubridate, janitor, scales, ggmosaic, psych, knitr, kableExtra)
 
 ################
 ## READ PHASE
@@ -194,6 +198,14 @@ racePlot <- ggplot(client, aes(race)) +
   guides(fill=guide_legend(title="Race"))
 racePlot
 
+##create table
+client %>%
+  group_by(race) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round(count / sum(count) * 100), 0) %>%
+  select(race, percent) %>%
+  kable()
+
 ##white vs POC
 racePlot2 <- ggplot(client, aes(race2)) +
   geom_bar(aes(y = (..count..) / sum(..count..), fill = race2)) +
@@ -205,6 +217,15 @@ racePlot2 <- ggplot(client, aes(race2)) +
         axis.title.x = element_blank()) +
   guides(fill=guide_legend(title="Race"))
 racePlot2
+
+##race 2 table
+client %>%
+  group_by(race2) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round(count / sum(count) * 100), 0) %>%
+  select(race2, percent) %>%
+  kable()
+
 
 ##race gender
 raceGender <- ggplot(client, aes(race2)) +
@@ -221,8 +242,19 @@ raceGender <- ggplot(client, aes(race2)) +
   guides(fill=guide_legend(title="gender"))
 raceGender
 
-##age race plot here
-ageRace <- ggplot(client, aes())
+## ehtnicity plot
+ethnicityPlot <- ggplot(client, aes(ethnicity)) +
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = ethnicity)) +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Client Ethnicity by Percentage") +
+  ylab("percentage") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank()) +
+  guides(fill=guide_legend(title="Race"))
+ethnicityPlot
+
+##ethnicity table
 
 ##ANSWERING SPECIFIC QUESTION:
 ##1. Is there a difference between POC and White clients in duration of enrollment
@@ -230,36 +262,6 @@ ageRace <- ggplot(client, aes())
 duration_race <-
   client_ee %>% group_by(client_id, race2) %>%
   summarise(avg_duration = mean(duration), num_enrollments = n())
-
-#simple stats
-IQR(duration_race$avg_duration) ##difference of its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value.
-mean(duration_race$avg_duration)
-median(duration_race$avg_duration)
-sd(duration_race$avg_duration)
-
-## t-test and confidence intervals
-w <- duration_race[duration_race$race2=="White",]
-poc <-duration_race[duration_race$race2=="Person of Color",]
-t.test(w$avg_duration, poc$avg_duration) ##no difference
-
-## confidence intervals white
-describe(w$avg_duration)
-n_w <- 21981
-xbar_w <- 0.8
-sd_w <- 1.89
-alpha <- 0.05 ##Confidence of 95%
-
-(xbar_w + qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.7750146
-(xbar_w - qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.8249854
-
-## confidence intervals poc
-describe(poc$avg_duration)
-n_poc <- 16810
-xbar_poc <- 0.63
-sd_poc <- 1.29
-alpha <- 0.05 ##Confidence of 95%
-(xbar_poc + qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6104991
-(xbar_poc - qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6495009
 
 ##visualize it
 durationRacePlot <- ggplot(duration_race[duration_race$avg_duration < 2.27,], aes(avg_duration)) +
@@ -272,6 +274,7 @@ durationRacePlot <- ggplot(duration_race[duration_race$avg_duration < 2.27,], ae
 durationRacePlot 
 ##
 
+
 ##only using completed enrollment cycles
 duration_race_filt <-
   client_ee %>% filter(!is.na(exit_date)) %>%
@@ -279,7 +282,7 @@ duration_race_filt <-
   group_by(client_id, race2) %>%
   summarise(avg_duration = mean(duration), num_enrollments = n())
 
-
+##transform to normalize
 duration_race_filt$log10_duration <- log10(duration_race_filt$avg_duration)
 #simple stats
 IQR(duration_race_filt$avg_duration) ##difference of its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value.
@@ -291,33 +294,37 @@ sd(duration_race_filt$avg_duration)
 duration_race_filt
 t.test(log10_duration ~ race2, data=duration_race_filt, alternative="two.sided") ##no difference
 aov(log10_duration ~ race2, data=duration_race_filt)
-# ## confidence intervals white
-# describe(w$avg_duration)
-# n_w <- 21981
-# xbar_w <- 0.8
-# sd_w <- 1.89
-# alpha <- 0.05 ##Confidence of 95%
-# 
-# (xbar_w + qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.7750146
-# (xbar_w - qnorm(alpha/2)*(sd_w/sqrt(n_w))) #0.8249854
-# 
-# ## confidence intervals poc
-# describe(poc$avg_duration)
-# n_poc <- 16810
-# xbar_poc <- 0.63
-# sd_poc <- 1.29
-# alpha <- 0.05 ##Confidence of 95%
-# (xbar_poc + qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6104991
-# (xbar_poc - qnorm(alpha/2)*(sd_poc/sqrt(n_poc))) #0.6495009
 
-durationRacePlotFilt <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
+w <- duration_race_filt %>% 
+  filter(race2 == "White") 
+poc <- duration_race_filt %>% 
+  filter(race2 == "Person of Color") 
+median(w$avg_duration) #0.13
+median(poc$avg_duration) #.16
+## difference of 11 days
+
+durationRacePlotFilt <-  ggplot(duration_race_filt[duration_race_filt$avg_duration < 1.07,], aes(avg_duration)) + # 1 sd
+  geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
+  # geom_vline(xintercept = .18, col = "coral4", size=1) + # median
+  ggtitle("Avg. Duration of Enrollment by Client Race") +
+  ylab("density") +
+  xlab("Duration in years for completed enrollments") +
+  geom_vline(xintercept = 0.145, col = "coral4", size=1)+
+  geom_text(aes(label="55 days", y=2, x=0.145), color="black", vjust=-1)
+durationRacePlotFilt
+
+
+##Log 10 duration race plot
+durationRacePlotFiltLog10 <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
   geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
   # geom_vline(xintercept = .18, col = "coral4", size=1) + # median
   ggtitle("Avg. Duration of Enrollment by Client Race") +
   ylab("density") +
   xlab("log10 of duration in years for completed enrollments") 
 # + geom_text(aes(label=".18", y=1, x=.18), color="black", vjust=-1)
-durationRacePlotFilt
+durationRacePlotFiltLog10
+
+
 ## 2. Is there a diffence between white and poc exit_reason
 ##Chi Sq Tests
 reasons <- unique(client_ee$exit_reason)
@@ -326,17 +333,67 @@ client_ee %>%  select(race2, exit_reason) %>%
   table() %>%
   chisq.test()
 
-
 ##find sig differences
-for(i in reasons){
-  print(i)
-  result <- client_ee %>% filter(exit_reason == i) %>% 
+pvals <- list()
+reas <- list()
+for(i in seq(reasons)){
+  result <- client_ee %>% filter(exit_reason == reasons[i]) %>% 
     select(race2, exit_reason) %>%
     table() %>%
-    chisq.test() %>%
-    pander()
-  print(result$p.value)
+    chisq.test() 
+  
+  pvals[[i]] <- result$p.value
+  reas[[i]] <- reasons[i]
 }
+
+data.frame(exit_reason=unlist(reas), pvals=unlist(pvals)) %>%
+  filter(pvals < 0.001) %>% 
+  mutate(pvals = "***") %>%
+  kable()
+
+chi_sq_results <- client_ee %>% 
+  select(race2, exit_reason) %>%
+  table() %>%
+  chisq.test() 
+
+
+exit <- data.frame(exit_reason=unlist(reas), pvals=unlist(pvals)) %>%
+  filter(pvals < 0.001)
+
+
+## What is the percentage of white / non-white that completed the program of sig findings
+exit_stats <- client_ee %>% 
+  # filter(exit_reason %in% "Completed program") %>%
+  filter(!is.na(exit_reason)) %>%
+  filter(!is.na(race2)) %>%
+  group_by(race2, exit_reason) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round( (count / sum(count) * 100), 2) )
+
+raceExit <- ggplot(exit_stats, aes(percent)) +
+  geom_bar() +
+  ggtitle("Client Gender by Race") +
+  ylab("percentage") +
+  xlab("race") +
+  # theme(
+  #   axis.text.x = element_blank(),
+  #       axis.ticks.x = element_blank(),
+  #       axis.title.x = element_blank()
+  #   ) +
+  guides(fill=guide_legend(title="reason"))
+
+raceExit
+
+
+
+##Project type by percentage
+projType <- client_ee %>% 
+  # filter(exit_reason %in% "Completed program") %>%
+  filter(!is.na(project_type)) %>%
+  filter(!is.na(race2)) %>%
+  group_by(race2, project_type) %>%
+  summarise(count = n()) %>%
+  mutate(percent = round( (count / sum(count) * 100), 2) )
 
 
 
