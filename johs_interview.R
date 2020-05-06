@@ -370,21 +370,18 @@ exit_stats <- client_ee %>%
   summarise(count = n()) %>%
   mutate(percent = round( (count / sum(count) * 100), 2) )
 
-raceExit <- ggplot(exit_stats, aes(percent)) +
-  geom_bar() +
-  ggtitle("Client Gender by Race") +
-  ylab("percentage") +
-  xlab("race") +
-  # theme(
-  #   axis.text.x = element_blank(),
-  #       axis.ticks.x = element_blank(),
-  #       axis.title.x = element_blank()
-  #   ) +
-  guides(fill=guide_legend(title="reason"))
+exit_plot <- client_ee %>% filter(!is.na(race2)) %>% filter(exit_reason %in% exit$exit_reason)
 
-raceExit
-
-
+raceExit <- ggplot(exit_plot, aes(x= exit_reason,  group=race2)) + 
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") +
+  geom_text(aes( label = scales::percent(..prop.., accuracy = 1),
+                 y= ..prop.. ), stat= "count", vjust = -.5) +
+  labs(y = "Percent", fill="day") +
+  facet_grid(~race2) +
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  theme(legend.title = element_blank())
+raceExit 
 
 ##Project type by percentage
 projType <- client_ee %>% 
@@ -402,3 +399,22 @@ projType <- client_ee %>%
 x <- lubridate::interval(ymd("2005-11-01"), ymd("2016-10-31"))
 names(ee)
 unique(ee$exit_reason)
+
+
+###
+ggplot(client_ee %>% filter(!is.na(race2) %>% filter(exit_reasons %in% exit$exit_reason)), aes(exit_reason, group = race2)) + 
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("relative frequencies") +
+  facet_grid(~race2) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(exit_plot, aes(x= exit_reason,  group=race2)) + 
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") +
+  geom_text(aes( label = scales::percent(..prop.., accuracy = 1),
+                 y= ..prop.. ), stat= "count", vjust = -.5) +
+  labs(y = "Percent", fill="day") +
+  facet_grid(~race2) +
+  scale_y_continuous(labels = scales::percent)
+

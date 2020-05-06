@@ -1,20 +1,17 @@
 ---
-title: "Asssessing Racial Equity through the Homeless Management Information System (HMIS)"
-author: "<img src='./assets/logo.png'>"
-date: "5/6/2020"
+title: "Assessing Racial Equity through the Homeless Management Information System (HMIS)"
+author: "<img style='border: none; box-shadow: none;' src='./assets/logo_transparent.png'>"
+date: "<small>JOHS Interview | 5/6/2020</small>"
 output: 
   revealjs::revealjs_presentation:
     theme: sky
     highlight: pygments
     center: true
     self_contained: false
-    # reveal_plugins: ["search", "zoom", "notes", "chalkboard", "menu"]
-    # reveal_options:
-    #   chalkboard: 
-    #     theme: chalkboard
-    #     toggleNotesButton: true
-    #   menu:
-    #     numbers: true
+    reveal_plugins: ["chalkboard"]
+    reveal_options:
+      chalkboard:
+        theme: chalkboard
 knit: (
   function(inputFile, encoding) { 
     rmarkdown::render( 
@@ -183,13 +180,24 @@ ee$duration <-
 client_ee <- client %>% inner_join(ee, by = c("client_id"))
 ```
 
+# Quick Intro
+
+## Hello
+<img style="max-height: 500px; border: none;" src="https://mappingaction.files.wordpress.com/2019/12/tim3-e1575161384528.jpg">
+
+##
+<img style="max-height: 500px; border: none; box-shadow: none;" src="https://mappingaction.files.wordpress.com/2018/09/cropped-maclogo_9_18_v5.png">
+
+##
+<img style="max-height: 500px; border: none; box-shadow: none;" src="https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Portland_Community_College_seal.svg/1200px-Portland_Community_College_seal.svg.png">
+
 # Agenda
 
 ##
 <ul>
   <li> Background </li>
-  <li class="fragment">Methods / Analysis </li>
-  <li class="fragment">Results </li>
+  <li class="fragment">Questions / Methods </li>
+  <li class="fragment">Analysis / Results </li>
   <li class="fragment">Future Research </li>
 </ul>
 
@@ -197,7 +205,7 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 
 ## What is an <span style="color: tomato;">HMIS</span>?
 
-<blockquote style="border: none; box-shadow: none;"> "Homeless Management Information Systems are used to record client information that is shared among homeless and near-homeless service providers in order to increase efficiencies and better meet client needs."<sub><small>City of Portland - 2020</small></sub></blockquote>
+<blockquote style="border: none; box-shadow: none;"> "<span style="color: tomato;">Homeless Management Information Systems</span> are used to record client information that is shared among homeless and near-homeless service providers in order to increase efficiencies and better meet client needs."<sub><small>City of Portland - 2020</small></sub></blockquote>
 <img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png">
 
 <!-- https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents -->
@@ -208,26 +216,16 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 
   <li class="fragment">Communities operate data systems that allow for accurate, comprehensive, and timely data collection, usage and reporting; and </li>
 
-  <li class="fragment">Federal government coordinates to receive and use data to make informed decisions in coordination with other data sets, across and within agencies.</li>
+  <li class="fragment">Federal government coordinates to receive and use data to <span style="color: tomato;">make informed decisions</span> in coordination with other data sets, across and within agencies.</li>
 </ul>
 
 ## Promote Racial and Ethnic Justice
 
 <blockquote style="border: none; box-shadow: none;"> "To eliminate the disproportionate rates of homelessness among many communities of color... using a <span style="color: tomato;">racial equity lens</span> across all program investments and dedicated funds to eliminate disparities by race and ethnicity."</blockquote><sub><small>Mulnomah County - 2020</small></sub>
-
+<img style="border: none; box-shadow: none;" src="https://multco.us/sites/all/themes/multco/logo.png">
 <!-- https://multco.us/housing-and-homelessness/our-vision-and-principles -->
 
-# Methods
-
-## Tools
-<img style="max-height: 500px; border: none; box-shadow: none;" src="https://i.ibb.co/th9XGdq/1-Jh-R8-Yqr7g9kn-YVYVmd7q-Q.png">
-<!-- <img style="max-height: 50px;" src="https://image.flaticon.com/icons/svg/25/25231.svg"> -->
-
-## Process
-<img style="max-height: 500px; border: none; box-shadow: none;" src="./assets/johs-prep.png">
-
-
-# Questions
+# Questions / Methods
 
 ## Questions
 <ul>
@@ -237,6 +235,14 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
  <li class="fragment">To what extent are race and permanent housing related?</li>
 </ul>
 
+## Methods
+
+## Tools
+<img style="max-height: 500px; border: none; box-shadow: none;" src="https://i.ibb.co/th9XGdq/1-Jh-R8-Yqr7g9kn-YVYVmd7q-Q.png">
+<!-- <img style="max-height: 50px;" src="https://image.flaticon.com/icons/svg/25/25231.svg"> -->
+
+## Process
+<img style="max-height: 500px; border: none; box-shadow: none;" src="./assets/johs-prep.png">
 
 
 # Analysis / Results
@@ -245,15 +251,20 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 
 ##
 ```{r racial demographics, echo=FALSE}
-racePlot <- ggplot(client, aes(race)) +
-  geom_bar(aes(y = (..count..) / sum(..count..), fill = race)) +
-  scale_y_continuous(labels = percent) +
+racePlot <- ggplot(client, aes(x= race)) + 
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = race), stat="count") +
+  geom_text(aes( label = percent((..count..) / sum(..count..), accuracy=2),
+                 y= (..count..) / sum(..count..) ), stat= "count", vjust = -.5) +
+  geom_hline(aes(yintercept=.77), color="#e76bf3", linetype="dashed") +
+  geom_text(aes(x=5, y=.74,label = "77% - ACS", vjust = -.5),  color="gray24") +
+  geom_hline(aes(yintercept=.06), color="#00bf7d", linetype="dashed") +
+  geom_text(aes(x=3, y=.06, label = "6% - ACS", vjust = -.5), color="gray24") +
   ggtitle("Client Race by Percentage") +
-  ylab("percentage") +
+  labs(y = "Percent", fill="race") +
+  scale_y_continuous(labels = scales::percent) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title.x = element_blank()) +
-  guides(fill=guide_legend(title="Race"))
+        axis.title.x = element_blank())
 racePlot
 ```
 <!-- Put a table here with percentages -->
@@ -274,16 +285,16 @@ client %>%
 
 ##
 ```{r racial demo2, echo=FALSE}
-racePlot2 <- ggplot(client, aes(race2)) +
-  geom_bar(aes(y = (..count..) / sum(..count..), fill = race2)) +
-  scale_y_continuous(labels = percent) +
+ggplot(client, aes(x= race2)) + 
+  geom_bar(aes(y = (..count..) / sum(..count..), fill = race2), stat="count") +
+  geom_text(aes( label = percent((..count..) / sum(..count..), accuracy=2),
+                 y= (..count..) / sum(..count..) ), stat= "count", vjust = -.5) +
   ggtitle("Client Race by Percentage") +
-  ylab("percentage") +
+  labs(y = "Percent", fill="race") +
+  scale_y_continuous(labels = scales::percent) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title.x = element_blank()) +
-  guides(fill=guide_legend(title="Race"))
-racePlot2
+        axis.title.x = element_blank())
 ```
 
 
@@ -356,7 +367,7 @@ durationRacePlotFiltLog10
 
 ## Does race affect enrollment exit reasons? 
 
-##
+## Significant Findings for Exit Reason
 ```{r exit reasons, echo=FALSE}
 reasons <- unique(client_ee$exit_reason)
 reasons <- reasons[!is.na(reasons)]
@@ -377,14 +388,36 @@ data.frame(exit_reason=unlist(reas), pvals=unlist(pvals)) %>%
   filter(pvals < 0.001) %>% 
   mutate(pvals = "***") %>%
   kable()
+
+exit <- data.frame(exit_reason=unlist(reas), pvals=unlist(pvals)) %>%
+  filter(pvals < 0.001)
 ```
 
 
 ## Answer: In 11 out of 14 of the stated reasons, there is a relationship between race and the reason a client exited. 
 
+##
+```{r exit reason sig, echo=FALSE}
+exit_plot <- client_ee %>% 
+  filter(!is.na(race2)) %>% 
+  filter(exit_reason %in% exit$exit_reason)
+
+raceExit <- ggplot(exit_plot, aes(x= exit_reason,  group=race2)) + 
+  geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat="count") +
+  geom_text(aes( label = scales::percent(..prop.., accuracy = 1),
+                 y= ..prop.. ), stat= "count", vjust = -.5) +
+  labs(y = "Frequency") +
+  ggtitle("Relative Frequency of Exit Reason by Race") +
+  facet_grid(~race2) +
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  theme(legend.position = "none")
+raceExit 
+```
+
 <!-- plot showing who completed a program -->
 
-##
+## 
 ```{r exit destination, echo=FALSE}
 destinations <- unique(client_ee$exit_destination)
 destinations <- destinations[!is.na(destinations)]
@@ -407,4 +440,11 @@ data.frame(exit_destination=unlist(dest), pvals=unlist(pvals)) %>%
   kable()
 ```
 
-## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination. 
+## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination on exit. 
+# Future Research
+
+## 
+<!-- <iframe src="https://rosecityresource.streetroots.org/"></iframe> -->
+<section data-background-iframe="https://slides.com" data-background-interactive>
+	<h2>Iframe</h2>
+</section>
