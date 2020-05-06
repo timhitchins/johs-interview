@@ -206,7 +206,7 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 ## What is an <span style="color: tomato;">HMIS</span>?
 
 <blockquote style="border: none; box-shadow: none;"> "<span style="color: tomato;">Homeless Management Information Systems</span> are used to record client information that is shared among homeless and near-homeless service providers in order to increase efficiencies and better meet client needs."<sub><small>City of Portland - 2020</small></sub></blockquote>
-<img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png">
+<a href="https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents"><img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png"></a>
 
 <!-- https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents -->
 
@@ -214,25 +214,27 @@ client_ee <- client %>% inner_join(ee, by = c("client_id"))
 <ul>
   <li class="fragment">Communities use their data to <span style="color: tomato;">optimize systems of care </span> through making ongoing system performance improvements and determining optimal resource allocation; </li>
 
-  <li class="fragment">Communities operate data systems that allow for accurate, comprehensive, and timely data collection, usage and reporting; and </li>
+  <li class="fragment">Communities operate data systems that allow for <span style="color: tomato;">accurate, comprehensive, and timely</span> data collection, usage and reporting; and </li>
 
   <li class="fragment">Federal government coordinates to receive and use data to <span style="color: tomato;">make informed decisions</span> in coordination with other data sets, across and within agencies.</li>
 </ul>
+<sub><small>US Department of Housing and Urban Development - 2020</small></sub><br>
+<a href="https://www.hudexchange.info/homelessness-assistance/data-strategy-usability/" target="_blank"><img style="max-height: 100px; border: none; box-shadow: none;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Seal_of_the_United_States_Department_of_Housing_and_Urban_Development.svg/1200px-Seal_of_the_United_States_Department_of_Housing_and_Urban_Development.svg.png"></a>
 
 ## Promote Racial and Ethnic Justice
 
-<blockquote style="border: none; box-shadow: none;"> "To eliminate the disproportionate rates of homelessness among many communities of color... using a <span style="color: tomato;">racial equity lens</span> across all program investments and dedicated funds to eliminate disparities by race and ethnicity."</blockquote><sub><small>Mulnomah County - 2020</small></sub>
-<img style="border: none; box-shadow: none;" src="https://multco.us/sites/all/themes/multco/logo.png">
+<blockquote style="border: none; box-shadow: none;"> "To eliminate the disproportionate rates of homelessness among many communities of color... using a <span style="color: tomato;">racial equity lens</span> across all program investments and dedicated funds to eliminate disparities by race and ethnicity."</blockquote><sub><small> Mulnomah County - 2020</small></sub><br>
+<a href="https://multco.us/housing-and-homelessness/our-vision-and-principles"><img style="border: none; box-shadow: none;" src="https://multco.us/sites/all/themes/multco/logo.png"></a>
 <!-- https://multco.us/housing-and-homelessness/our-vision-and-principles -->
 
 # Questions / Methods
 
 ## Questions
 <ul>
- <li class="fragment">Demographics: What is the racial and ethnic composition of clients represented in the HMIS sample?</li>
+ <li class="fragment">Demographics: What is the racial and ethnic composition of clients represented in the HMIS?</li>
  <li class="fragment">To what extent are client race and enrollment duration related?</li>
  <li class="fragment">To what extent are enrollment exit reasons and race related?</li>
- <li class="fragment">To what extent are race and permanent housing related?</li>
+ <li class="fragment"><s>To what extent are race and enrollment in permanent housing related?</s></li>
 </ul>
 
 ## Methods
@@ -270,16 +272,16 @@ racePlot
 <!-- Put a table here with percentages -->
 
 
-##
-```{r racetable, echo=FALSE}
-client %>%
-  group_by(race) %>%
-  summarise(count = n()) %>%
-  mutate(percent = round(count / sum(count) * 100), 2) %>%
-  select(race, percent) %>%
-  kable() %>%
-  kable_styling()
-```
+<!-- ## -->
+<!-- ```{r racetable, echo=FALSE} -->
+<!-- client %>% -->
+<!--   group_by(race) %>% -->
+<!--   summarise(count = n()) %>% -->
+<!--   mutate(percent = round(count / sum(count) * 100), 2) %>% -->
+<!--   select(race, percent) %>% -->
+<!--   kable() %>% -->
+<!--   kable_styling() -->
+<!-- ``` -->
 
 
 
@@ -298,15 +300,15 @@ ggplot(client, aes(x= race2)) +
 ```
 
 
-##
-```{r race2, echo=FALSE}
-client %>%
-  group_by(race2) %>%
-  summarise(count = n()) %>%
-  mutate(percent = round(count / sum(count) * 100), 0) %>%
-  select(race2, percent) %>%
-  kable()
-```
+<!-- ## -->
+<!-- ```{r race2, echo=FALSE} -->
+<!-- client %>% -->
+<!--   group_by(race2) %>% -->
+<!--   summarise(count = n()) %>% -->
+<!--   mutate(percent = round(count / sum(count) * 100), 0) %>% -->
+<!--   select(race2, percent) %>% -->
+<!--   kable() -->
+<!-- ``` -->
 
 ## Portland ACS Data for Context
 <!-- Include acs data here -->
@@ -327,7 +329,7 @@ ethnicityPlot
 ```
 
 <!-- include acsd data here -->
-## To what extent are client race/ethnicity and enrollment duration related?
+## To what extent are client race and enrollment duration related?
 
 ##
 ```{r duration, echo=FALSE}
@@ -354,7 +356,7 @@ durationRacePlotFilt
 
 
 ##
-```{r log transfomr race, echo=FALSE, warning=FALSE}
+```{r log transform race, echo=FALSE, warning=FALSE}
 durationRacePlotFiltLog10 <-  ggplot(duration_race_filt, aes(log10(avg_duration))) +
   geom_density(aes(group=race2, colour=race2, fill=race2), alpha=0.3) +
   ggtitle("Avg. Duration of Enrollment by Client Race") +
@@ -363,9 +365,9 @@ durationRacePlotFiltLog10 <-  ggplot(duration_race_filt, aes(log10(avg_duration)
 durationRacePlotFiltLog10
 ```
 
-## Answer: There is no significant evidence suggesting a difference between race and the duration of enrollment.
+## Answer: There is no difference between the average duration of enrollment for white clients and clients of color.
 
-## Does race affect enrollment exit reasons? 
+## To what extent does race relate to enrollment exit reasons? 
 
 ## Significant Findings for Exit Reason
 ```{r exit reasons, echo=FALSE}
@@ -417,34 +419,60 @@ raceExit
 
 <!-- plot showing who completed a program -->
 
-## 
-```{r exit destination, echo=FALSE}
-destinations <- unique(client_ee$exit_destination)
-destinations <- destinations[!is.na(destinations)]
+<!-- ##  -->
+<!-- ```{r exit destination, echo=FALSE} -->
+<!-- destinations <- unique(client_ee$exit_destination) -->
+<!-- destinations <- destinations[!is.na(destinations)] -->
 
-pvals <- list()
-dest <- list()
-for(i in seq(destinations)){
-  result <- client_ee %>% filter(exit_destination == destinations[i]) %>% 
-    select(race2, exit_destination) %>%
-    table() %>%
-    chisq.test() 
-  
-  pvals[[i]] <- result$p.value
-  dest[[i]] <- destinations[i]
-}
+<!-- pvals <- list() -->
+<!-- dest <- list() -->
+<!-- for(i in seq(destinations)){ -->
+<!--   result <- client_ee %>% filter(exit_destination == destinations[i]) %>%  -->
+<!--     select(race2, exit_destination) %>% -->
+<!--     table() %>% -->
+<!--     chisq.test()  -->
 
-data.frame(exit_destination=unlist(dest), pvals=unlist(pvals)) %>%
-  filter(pvals < 0.001) %>% 
-  mutate(pvals = "***") %>%
-  kable()
-```
+<!--   pvals[[i]] <- result$p.value -->
+<!--   dest[[i]] <- destinations[i] -->
+<!-- } -->
 
-## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination on exit. 
+<!-- data.frame(exit_destination=unlist(dest), pvals=unlist(pvals)) %>% -->
+<!--   filter(pvals < 0.001) %>%  -->
+<!--   mutate(pvals = "***") %>% -->
+<!--   kable() -->
+<!-- ``` -->
+
+<!-- ## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination on exit.  -->
+
 # Future Research
 
-## 
-<!-- <iframe src="https://rosecityresource.streetroots.org/"></iframe> -->
-<section data-background-iframe="https://slides.com" data-background-interactive>
-	<h2>Iframe</h2>
-</section>
+## Further exploration of dataset
+<ul>
+  <li class="fragment">Explore same questions, but with ethnicity as a variable.</li>
+  <li class="fragment">To what extent are race/ethnicity related to enrollment in permanent housing?</li>
+</ul>
+
+
+## Addtional data collection
+
+<p>Of the exit reasons found to have a relationship to race, are there additional factors that are realted to that specific reason?<p> 
+
+## Spatial Analysis 
+<p>To what extent are enrollment exit reasons and proximity to services related?</p>
+<a href="https://rosecityresource.streetroots.org/"><img style="max-height: 350px" src="./assets/rcr.png"></a>
+
+## Sources:
+<small>
+  <ul>
+  <li>“Homeless Management Information System.” hudexchange.info. US Department of Housing and Urban Development, 26 May. 2020. Web. 6 May. 2020.</li>
+  <li>“Our Vision and Principles.” multco.us. Multnomah County, 26 May. 2020. Web. 6 May. 2020.</li>
+  <li>“SNAPS Data Strategy & Usability.” hudexchange.info. US Department of Housing and Urban Development, 26 May. 2020. Web. 6 May. 2020.</li>
+  <li>U.S. Census Bureau; American Community Survey, 2018 American Community Survey 5-Year Estimates, Table B03002; generated by Tim Hitchins; using data.census.gov; <https://data.census.gov/>; (2 May 2020).</li>
+  <li>Joint Office of Homeless Services, 2019 Homeless Management Information System, "Data"; generated by Anonymous; (1 May 2020).</li>
+  </ul>
+</small>
+
+## Thank You!
+<p><a href="https://github.com/timhitchins/johs-interview" target="_blank">Analysis link</a></p>
+<p><a href="https://timhitchins.github.io/johs-interview/#/" target="_blank">Presentation link</a></p><br>
+<img style="max-height: 200px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">

@@ -445,7 +445,6 @@ document.getElementsByTagName('head')[0].appendChild(style);
 
     <link href="index_files/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
     <link href="index_files/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
-    <script src="index_files/kePrint-0.0.1/kePrint.js"></script>
 </head>
 <body>
   <div class="reveal">
@@ -489,7 +488,7 @@ Future Research
 <blockquote style="border: none; box-shadow: none;">
 “<span style="color: tomato;">Homeless Management Information Systems</span> are used to record client information that is shared among homeless and near-homeless service providers in order to increase efficiencies and better meet client needs.”<sub><small>City of Portland - 2020</small></sub>
 </blockquote>
-<p><img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png"></p>
+<p><a href="https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents"><img style="border: none; box-shadow: none;" src="https://beta.portland.gov/themes/custom/cloudy/images/brand/seal-logo-60.png"></a></p>
 <!-- https://beta.portland.gov/phb/homeless-management-information-system-hmis#toc-additional-links-and-documents -->
 </section><section id="snaps-guidelines" class="slide level2">
 <h2>SNAPS Guidelines</h2>
@@ -498,24 +497,25 @@ Future Research
 Communities use their data to <span style="color: tomato;">optimize systems of care </span> through making ongoing system performance improvements and determining optimal resource allocation;
 </li>
 <li class="fragment">
-Communities operate data systems that allow for accurate, comprehensive, and timely data collection, usage and reporting; and
+Communities operate data systems that allow for <span style="color: tomato;">accurate, comprehensive, and timely</span> data collection, usage and reporting; and
 </li>
 <li class="fragment">
 Federal government coordinates to receive and use data to <span style="color: tomato;">make informed decisions</span> in coordination with other data sets, across and within agencies.
 </li>
 </ul>
+<p><sub><small>US Department of Housing and Urban Development - 2020</small></sub><br> <a href="https://www.hudexchange.info/homelessness-assistance/data-strategy-usability/" target="_blank"><img style="max-height: 100px; border: none; box-shadow: none;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Seal_of_the_United_States_Department_of_Housing_and_Urban_Development.svg/1200px-Seal_of_the_United_States_Department_of_Housing_and_Urban_Development.svg.png"></a></p>
 </section><section id="promote-racial-and-ethnic-justice" class="slide level2">
 <h2>Promote Racial and Ethnic Justice</h2>
 <blockquote style="border: none; box-shadow: none;">
 “To eliminate the disproportionate rates of homelessness among many communities of color… using a <span style="color: tomato;">racial equity lens</span> across all program investments and dedicated funds to eliminate disparities by race and ethnicity.”
 </blockquote>
-<p><sub><small>Mulnomah County - 2020</small></sub> <img style="border: none; box-shadow: none;" src="https://multco.us/sites/all/themes/multco/logo.png"> <!-- https://multco.us/housing-and-homelessness/our-vision-and-principles --></p>
+<p><sub><small> Mulnomah County - 2020</small></sub><br> <a href="https://multco.us/housing-and-homelessness/our-vision-and-principles"><img style="border: none; box-shadow: none;" src="https://multco.us/sites/all/themes/multco/logo.png"></a> <!-- https://multco.us/housing-and-homelessness/our-vision-and-principles --></p>
 </section></section>
 <section><section id="questions-methods" class="title-slide slide level1"><h1>Questions / Methods</h1></section><section id="questions" class="slide level2">
 <h2>Questions</h2>
 <ul>
 <li class="fragment">
-Demographics: What is the racial and ethnic composition of clients represented in the HMIS sample?
+Demographics: What is the racial and ethnic composition of clients represented in the HMIS?
 </li>
 <li class="fragment">
 To what extent are client race and enrollment duration related?
@@ -524,7 +524,7 @@ To what extent are client race and enrollment duration related?
 To what extent are enrollment exit reasons and race related?
 </li>
 <li class="fragment">
-To what extent are race and permanent housing related?
+<s>To what extent are race and enrollment in permanent housing related?</s>
 </li>
 </ul>
 </section><section id="methods" class="slide level2">
@@ -541,133 +541,48 @@ To what extent are race and permanent housing related?
 </section><section id="section-3" class="slide level2">
 <h2></h2>
 <p><img src="index_files/figure-revealjs/racial%20demographics-1.png" width="768" /> <!-- Put a table here with percentages --></p>
+<!-- ## -->
+<!-- ```{r racetable, echo=FALSE} -->
+<!-- client %>% -->
+<!--   group_by(race) %>% -->
+<!--   summarise(count = n()) %>% -->
+<!--   mutate(percent = round(count / sum(count) * 100), 2) %>% -->
+<!--   select(race, percent) %>% -->
+<!--   kable() %>% -->
+<!--   kable_styling() -->
+<!-- ``` -->
 </section><section id="section-4" class="slide level2">
 <h2></h2>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-race
-</th>
-<th style="text-align:right;">
-percent
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-American Indian or Alaska Native
-</td>
-<td style="text-align:right;">
-7
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Asian
-</td>
-<td style="text-align:right;">
-3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Black or African American
-</td>
-<td style="text-align:right;">
-27
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Native Hawaiian or Other Pacific Islander
-</td>
-<td style="text-align:right;">
-3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-White
-</td>
-<td style="text-align:right;">
-50
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-11
-</td>
-</tr>
-</tbody>
-</table>
-</section><section id="section-5" class="slide level2">
-<h2></h2>
 <p><img src="index_files/figure-revealjs/racial%20demo2-1.png" width="768" /></p>
-</section><section id="section-6" class="slide level2">
-<h2></h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">
-race2
-</th>
-<th style="text-align:right;">
-percent
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Person of Color
-</td>
-<td style="text-align:right;">
-38
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-White
-</td>
-<td style="text-align:right;">
-50
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:right;">
-11
-</td>
-</tr>
-</tbody>
-</table>
+<!-- ## -->
+<!-- ```{r race2, echo=FALSE} -->
+<!-- client %>% -->
+<!--   group_by(race2) %>% -->
+<!--   summarise(count = n()) %>% -->
+<!--   mutate(percent = round(count / sum(count) * 100), 0) %>% -->
+<!--   select(race2, percent) %>% -->
+<!--   kable() -->
+<!-- ``` -->
 </section><section id="portland-acs-data-for-context" class="slide level2">
 <h2>Portland ACS Data for Context</h2>
 <!-- Include acs data here -->
 <p><img style="border: none; box-shadow: none;" src="assets/racial_pop_pdx.png"></p>
-</section><section id="section-7" class="slide level2">
+</section><section id="section-5" class="slide level2">
 <h2></h2>
 <p><img src="index_files/figure-revealjs/ethnicity-1.png" width="768" /></p>
 <!-- include acsd data here -->
-</section><section id="to-what-extent-are-client-raceethnicity-and-enrollment-duration-related" class="slide level2">
-<h2>To what extent are client race/ethnicity and enrollment duration related?</h2>
-</section><section id="section-8" class="slide level2">
+</section><section id="to-what-extent-are-client-race-and-enrollment-duration-related" class="slide level2">
+<h2>To what extent are client race and enrollment duration related?</h2>
+</section><section id="section-6" class="slide level2">
 <h2></h2>
 <p><img src="index_files/figure-revealjs/duration-1.png" width="768" /></p>
-</section><section id="section-9" class="slide level2">
+</section><section id="section-7" class="slide level2">
 <h2></h2>
-<p><img src="index_files/figure-revealjs/log%20transfomr%20race-1.png" width="768" /></p>
-</section><section id="answer-there-is-no-significant-evidence-suggesting-a-difference-between-race-and-the-duration-of-enrollment." class="slide level2">
-<h2>Answer: There is no significant evidence suggesting a difference between race and the duration of enrollment.</h2>
-</section><section id="does-race-affect-enrollment-exit-reasons" class="slide level2">
-<h2>Does race affect enrollment exit reasons?</h2>
+<p><img src="index_files/figure-revealjs/log%20transform%20race-1.png" width="768" /></p>
+</section><section id="answer-there-is-no-difference-between-the-average-duration-of-enrollment-for-white-clients-and-clients-of-color." class="slide level2">
+<h2>Answer: There is no difference between the average duration of enrollment for white clients and clients of color.</h2>
+</section><section id="to-what-extent-does-race-relate-to-enrollment-exit-reasons" class="slide level2">
+<h2>To what extent does race relate to enrollment exit reasons?</h2>
 </section><section id="significant-findings-for-exit-reason" class="slide level2">
 <h2>Significant Findings for Exit Reason</h2>
 <table>
@@ -774,117 +689,82 @@ Transfer to another program (HOPWA ONLY)
 </table>
 </section><section id="answer-in-11-out-of-14-of-the-stated-reasons-there-is-a-relationship-between-race-and-the-reason-a-client-exited." class="slide level2">
 <h2>Answer: In 11 out of 14 of the stated reasons, there is a relationship between race and the reason a client exited.</h2>
-</section><section id="section-10" class="slide level2">
+</section><section id="section-8" class="slide level2">
 <h2></h2>
 <p><img src="index_files/figure-revealjs/exit%20reason%20sig-1.png" width="768" /></p>
 <!-- plot showing who completed a program -->
-</section><section id="section-11" class="slide level2">
-<h2></h2>
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">
-exit_destination
-</th>
-<th style="text-align:left;">
-pvals
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Permanent housing
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-No exit interview completed
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Transitional housing
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Place not meant for habitation
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Emergency shelter
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Other
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Hospital or other residential non-psychiatric medical facility
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Deceased
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Hotel or motel paid for without emergency shelter voucher
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Substance abuse treatment facility or detox center
-</td>
-<td style="text-align:left;">
-***
-</td>
-</tr>
-</tbody>
-</table>
-</section><section id="answer-in-10-of-17-stated-destinations-there-is-a-relationship-between-race-and-the-destination-on-exit." class="slide level2">
-<h2>Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination on exit.</h2>
+<!-- ##  -->
+<!-- ```{r exit destination, echo=FALSE} -->
+<!-- destinations <- unique(client_ee$exit_destination) -->
+<!-- destinations <- destinations[!is.na(destinations)] -->
+<!-- pvals <- list() -->
+<!-- dest <- list() -->
+<!-- for(i in seq(destinations)){ -->
+<!--   result <- client_ee %>% filter(exit_destination == destinations[i]) %>%  -->
+<!--     select(race2, exit_destination) %>% -->
+<!--     table() %>% -->
+<!--     chisq.test()  -->
+<!--   pvals[[i]] <- result$p.value -->
+<!--   dest[[i]] <- destinations[i] -->
+<!-- } -->
+<!-- data.frame(exit_destination=unlist(dest), pvals=unlist(pvals)) %>% -->
+<!--   filter(pvals < 0.001) %>%  -->
+<!--   mutate(pvals = "***") %>% -->
+<!--   kable() -->
+<!-- ``` -->
+<!-- ## Answer: In 10 of 17 stated destinations, there is a relationship between race and the destination on exit.  -->
 </section></section>
-<section><section id="future-research" class="title-slide slide level1"><h1>Future Research</h1></section><section id="section-12" class="slide level2">
-<h2></h2>
-<!-- <iframe src="https://rosecityresource.streetroots.org/"></iframe> -->
-<section data-background-iframe="https://slides.com" data-background-interactive>
-<h2>
-Iframe
-</h2>
-</section>
+<section><section id="future-research" class="title-slide slide level1"><h1>Future Research</h1></section><section id="further-exploration-of-dataset" class="slide level2">
+<h2>Further exploration of dataset</h2>
+<ul>
+<li class="fragment">
+Explore same questions, but with ethnicity as a variable.
+</li>
+<li class="fragment">
+To what extent are race/ethnicity related to enrollment in permanent housing?
+</li>
+</ul>
+</section><section id="addtional-data-collection" class="slide level2">
+<h2>Addtional data collection</h2>
+<p>
+Of the exit reasons found to have a relationship to race, are there additional factors that are realted to that specific reason?
+<p>
+</section><section id="spatial-analysis" class="slide level2">
+<h2>Spatial Analysis</h2>
+<p>
+To what extent are enrollment exit reasons and proximity to services related?
+</p>
+<p><a href="https://rosecityresource.streetroots.org/"><img style="max-height: 350px" src="assets/rcr.png"></a></p>
+</section><section id="sources" class="slide level2">
+<h2>Sources:</h2>
+<small>
+<ul>
+<li>
+“Homeless Management Information System.” hudexchange.info. US Department of Housing and Urban Development, 26 May. 2020. Web. 6 May. 2020.
+</li>
+<li>
+“Our Vision and Principles.” multco.us. Multnomah County, 26 May. 2020. Web. 6 May. 2020.
+</li>
+<li>
+“SNAPS Data Strategy &amp; Usability.” hudexchange.info. US Department of Housing and Urban Development, 26 May. 2020. Web. 6 May. 2020.
+</li>
+<li>
+U.S. Census Bureau; American Community Survey, 2018 American Community Survey 5-Year Estimates, Table B03002; generated by Tim Hitchins; using data.census.gov; <a href="https://data.census.gov/" class="uri">https://data.census.gov/</a>; (2 May 2020).
+</li>
+<li>
+Joint Office of Homeless Services, 2019 Homeless Management Information System, “Data”; generated by Anonymous; (1 May 2020).
+</li>
+</ul>
+<p></small></p>
+</section><section id="thank-you" class="slide level2">
+<h2>Thank You!</h2>
+<p>
+<a href="https://github.com/timhitchins/johs-interview" target="_blank">Analysis link</a>
+</p>
+<p>
+<a href="https://timhitchins.github.io/johs-interview/#/" target="_blank">Presentation link</a>
+</p>
+<p><br> <img style="max-height: 200px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></p>
 </section></section>
     </div>
   </div>
